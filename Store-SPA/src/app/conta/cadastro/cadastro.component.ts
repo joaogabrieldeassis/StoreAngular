@@ -17,7 +17,9 @@ export class CadastroComponent implements OnInit {
   cadastroForm!: FormGroup;
   usuario!: Usuario;
 
-  constructor(private formBuilder: FormBuilder, private cadastroService: ContaService) { }
+  constructor(private formBuilder: FormBuilder, private cadastroService: ContaService) {
+    this.errors = [];
+  }
 
   ngOnInit(): void {
 
@@ -31,8 +33,19 @@ export class CadastroComponent implements OnInit {
   adicionarConta() {
     if (this.cadastroForm.dirty && this.cadastroForm.valid) {
       this.usuario = Object.assign({}, this.usuario, this.cadastroForm.value)
-      this.cadastroService.registrarUsuario(this.usuario);
+      this.cadastroService.registrarUsuario(this.usuario)
+        .subscribe(
+          success => { this.processarSucesso(success) },
+          errors => { this.processarFalha(errors) }
+        );
 
     }
+  }
+  processarSucesso(response: any) {
+    this.cadastroForm.reset()
+    this.errors = [];
+  }
+  processarFalha(fail: any) {
+    this.errors = fail.error.errors;
   }
 }
